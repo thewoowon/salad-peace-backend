@@ -4,7 +4,7 @@ import { Cron, Interval, SchedulerRegistry, Timeout } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
-import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 import { User } from 'src/users/entities/user.entity';
 import { LessThan, Repository } from 'typeorm';
 import {
@@ -19,8 +19,8 @@ export class PaymentService {
   constructor(
     @InjectRepository(Payment)
     private readonly payments: Repository<Payment>,
-    @InjectRepository(Restaurant)
-    private readonly restaurants: Repository<Restaurant>,
+    @InjectRepository(Building)
+    private readonly buildings: Repository<Building>,
     private schedulerRegistry: SchedulerRegistry,
   ) {}
   async createPayment(
@@ -28,7 +28,7 @@ export class PaymentService {
     { transactionId, restaurantId }: CreatePaymentInput,
   ): Promise<CreatePaymentOutput> {
     try {
-      const restaurant = await this.restaurants.findOne({
+      const restaurant = await this.buildings.findOne({
         where: {
           id: restaurantId,
         },

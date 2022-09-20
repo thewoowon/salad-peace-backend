@@ -6,6 +6,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { IsEnum, IsNumber } from 'class-validator';
+import { Building } from 'src/buildings/entities/building.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -54,13 +55,13 @@ export class Order extends CoreEntity {
   @RelationId((order: Order) => order.driver)
   driverId: number;
 
-  @Field((type) => Restaurant)
-  @ManyToOne((type) => Restaurant, (restaurant) => restaurant.orders, {
+  @Field((type) => Building)
+  @ManyToOne((type) => Building, (building) => building.orders, {
     nullable: true,
     onDelete: 'SET NULL',
     eager: true,
   })
-  restaurant?: Restaurant;
+  building?: Building;
 
   @Field((type) => [OrderItem])
   @ManyToMany((type) => OrderItem, { eager: true })

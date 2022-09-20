@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { Order } from 'src/orders/entities/order.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, OneToMany, OneToOne } from 'typeorm';
 import { Salad } from './salad.entity';
@@ -18,6 +19,10 @@ export class Building extends CoreEntity {
   // 상주 근로자 수
   @Field((type) => Number)
   permanentWorker: number;
+
+  @Field((type) => [Order])
+  @OneToMany((type) => Order, (order) => order.building)
+  orders: Order[];
 
   @Field((type) => [Salad])
   @OneToMany((type) => Salad, (salad) => salad.building)
