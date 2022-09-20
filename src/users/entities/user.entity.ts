@@ -1,5 +1,13 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import {
   Field,
   InputType,
@@ -9,13 +17,13 @@ import {
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
-import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 export enum UserRole {
   Client = 'Client',
-  Owner = 'Owner',
+  Master = 'Master',
   Delivery = 'Delivery',
 }
 
@@ -44,9 +52,9 @@ export class User extends CoreEntity {
   @IsBoolean()
   verified: boolean;
 
-  @Field((type) => [Restaurant])
-  @OneToMany((type) => Restaurant, (restaurant) => restaurant.owner)
-  restaurants: Restaurant[];
+  @Field((type) => Building)
+  @ManyToOne((type) => Building, (building) => building.buildingCode)
+  building: Building;
 
   @Field((type) => [Order])
   @OneToMany((type) => Order, (order) => order.customer)
