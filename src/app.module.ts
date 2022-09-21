@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
@@ -13,6 +18,18 @@ import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { Context } from 'apollo-server-core';
+import { User } from './users/entities/user.entity';
+import { Verification } from './users/entities/verification.entity';
+import { Building } from './buildings/entities/building.entity';
+import { Order } from './orders/entities/order.entity';
+import { OrderItem } from './orders/entities/order-item.entity';
+import { Payment } from './payments/entities/payment.entity';
+import { Salad } from './buildings/entities/salad.entity';
+import { Category } from './buildings/entities/category.entity';
+import { ScheduleModule } from '@nestjs/schedule';
+import { JwtMiddleware } from './jwt/jwt.middleware';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -37,9 +54,27 @@ import * as Joi from 'joi';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      subscriptions: {
+        'graphql-ws': {
+          onConnect: (context: Context<any>) => {
+            const { connectionParams, extra } = context;
+            extra.token = connectionParams['x-jwt'];
+          },
+        },
+      },
+      installSubscriptionHandlers: true,
       autoSchemaFile: true,
+      persistedQueries: false,
+      context: ({ req, extra }) => {
+        console.log('여기에 req, extra');
+        console.log(extra?.token);
+        if (extra) {
+          return { token: extra.token };
+        } else {
+          return { token: req.headers['x-jwt'] };
+        }
+      },
     }),
-    BuildingsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       ...(process.env.DATABASE_URL
@@ -55,16 +90,43 @@ import * as Joi from 'joi';
       logging:
         process.env.NODE_ENV !== 'production' &&
         process.env.NODE_ENV !== 'test',
+      entities: [
+        User,
+        Verification,
+        Building,
+        Category,
+        Salad,
+        Order,
+        OrderItem,
+        Payment,
+      ],
     }),
     UsersModule,
-    OrdersModule,
-    PaymentsModule,
-    MailModule,
+    ScheduleModule.forRoot(),
+    JwtModule.forRoot({
+      privateKey: process.env.PRIVATE_KEY,
+    }),
+    MailModule.forRoot({
+      apiKey: process.env.MAILGUN_API_KEY,
+      domain: process.env.MAILGUN_DOMAIN_NAME,
+      fromEmail: process.env.MAILGUN_FROM_EMAIL,
+    }),
+    BuildingsModule,
     AuthModule,
+    OrdersModule,
     CommonModule,
-    JwtModule,
+    PaymentsModule,
+    CommonModule,
+    UploadsModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes({
+      path: '/graphql',
+      method: RequestMethod.POST,
+    });
+  }
+}

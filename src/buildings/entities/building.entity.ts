@@ -3,7 +3,8 @@ import { string } from 'joi';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Category } from './category.entity';
 import { Salad } from './salad.entity';
 
 @InputType({ isAbstract: true }) // 인자로 넘기기 위한 타입이라는 것을 알려줌
@@ -46,4 +47,11 @@ export class Building extends CoreEntity {
   @Column({ nullable: false, unique: true })
   @Field((type) => String, { nullable: false })
   buildingCode: string;
+
+  @Field((type) => Category, { nullable: true })
+  @ManyToOne(() => Category, (category) => category.buildings, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  category: Category;
 }
