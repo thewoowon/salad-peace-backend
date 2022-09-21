@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { stat } from 'fs';
 import { PubSub } from 'graphql-subscriptions';
 import {
-  NEW_COOKED_ORDER,
+  NEW_READY_ORDER,
   NEW_ORDER_UPDATE,
   NEW_PENDING_ORDER,
   PUB_SUB,
@@ -28,67 +28,63 @@ export class OrderService {
     @InjectRepository(OrderItem)
     private readonly orderItems: Repository<OrderItem>,
     @InjectRepository(Building)
-    private readonly restaurants: Repository<Building>,
+    private readonly buildings: Repository<Building>,
     @InjectRepository(Salad)
-    private readonly dishes: Repository<Salad>,
+    private readonly salads: Repository<Salad>,
     @Inject(PUB_SUB) private readonly pubSub: PubSub,
   ) {}
 
   async createOrder(
     customer: User,
-    { restaurantId, items }: CreateOrderInput,
+    { items }: CreateOrderInput,
   ): Promise<CreateOrderOutput> {
     try {
-      const restaurant = await this.restaurants.findOne({
+      const building = await this.buildings.findOne({
         where: {
-          id: restaurantId,
+          id: customer.buildingId,
         },
       });
-      if (!restaurant) {
+      if (!building) {
         return {
           ok: false,
-          error: 'Restaurant no Found',
+          error: 'Building no Found',
         };
       }
       let orderFinalPrice = 0;
       const orderItems: OrderItem[] = [];
+      // 단일 품목이므로 길이는 1
       for (const item of items) {
-        const dish = await this.dishes.findOne({
+        // items는 배열 객체
+        // item은 배열 객체의 요소 -> CreateOrderItemInput -> saladId, options?[]
+        const salad = await this.salads.findOne({
           where: {
-            id: item.dishId,
+            id: item.saladId,
           },
         });
-        if (!dish) {
+        if (!salad) {
           return {
             ok: false,
-            error: 'Dish not found.',
+            error: 'Salad not found.',
           };
         }
-        let dishFinalPrice = dish.price;
+        let saladFinalPrice = salad.price;
 
         for (const itemOption of item.options) {
-          const dishOption = dish.options.find(
-            (dishOption) => dishOption.name === itemOption.name,
-          );
-          if (dishOption) {
-            if (dishOption.extra) {
-              dishFinalPrice = dishFinalPrice + dishOption.extra;
-            } else {
-              const dishOptionChoice = dishOption.choices?.find(
-                (optionChoice) => optionChoice.name === itemOption.choice,
-              );
-              if (dishOptionChoice) {
-                if (dishOptionChoice.extra) {
-                  dishFinalPrice = dishFinalPrice + dishOptionChoice.extra;
-                }
-              }
+          const saladOption = salad.options.find(
+            (saladOption) => saladOption.name === itemOption.name,
+          ); // 추가적인 옵션은 갯수뿐.
+          if (saladOption) {
+            // 갯수 옵션을 찾고 있다면 가격을 곱셈하여 구한다.
+            if (saladOption.extra) {
+              saladFinalPrice = saladOption.extra * saladFinalPrice; // 갯수
             }
+            //그 외의 추가 옵션 없으므로 종료한다.
           }
         }
-        orderFinalPrice = orderFinalPrice + dishFinalPrice;
+        orderFinalPrice = orderFinalPrice + saladFinalPrice;
         const orderItem = await this.orderItems.save(
           this.orderItems.create({
-            dish,
+            salad,
             options: item.options,
           }),
         );
@@ -96,14 +92,14 @@ export class OrderService {
       }
       const order = await this.orders.save(
         this.orders.create({
-          customer,
-          restaurant,
+          customer: customer,
+          building: building,
           total: orderFinalPrice,
           items: orderItems,
         }),
       );
       await this.pubSub.publish(NEW_PENDING_ORDER, {
-        pendingOrders: { order, ownerId: restaurant.ownerId },
+        pendingOrders: { order, builingId: building.id },
       });
       return {
         ok: true,
@@ -124,37 +120,32 @@ export class OrderService {
   ): Promise<GetOrdersOutput> {
     try {
       let orders: Order[];
+      // 실제 고객일 때,
       if (user.role === UserRole.Client) {
         orders = await this.orders.find({
           where: {
             customer: {
               id: user.id,
             },
-            ...(status && { status }),
+            ...(status && { status: status }), // status가 있을 때만 status를 넣어준다.
           },
         });
+        // 배송기사 일 때,
       } else if (user.role === UserRole.Delivery) {
         orders = await this.orders.find({
           where: {
             driver: {
               id: user.id,
             },
-            ...(status && { status }),
+            ...(status && { status }), // status가 있을 때만 status를 넣어준다.
           },
         });
-      } else if (user.role === UserRole.Owner) {
-        const restaurants = await this.restaurants.find({
-          where: {
-            owner: {
-              id: user.id,
-            },
-          },
+        // 운영자일 때, 모든 주문 내역을 가져온다.
+      } else if (user.role === UserRole.Master) {
+        const buildings = await this.buildings.find({
           relations: ['orders'],
         });
-        orders = restaurants.map((retaurant) => retaurant.orders).flat(1);
-        if (status) {
-          orders = orders.filter((order) => order.status === status);
-        }
+        orders = buildings.map((building) => building.orders).flat(1);
       }
       return {
         ok: true,
@@ -211,14 +202,11 @@ export class OrderService {
     if (user.role === UserRole.Delivery && order.driverId !== user.id) {
       canSee = false;
     }
-    if (user.role === UserRole.Owner && order.restaurant.ownerId !== user.id) {
-      canSee = false;
-    }
-
     return canSee;
   }
 
   async editOrder(
+    // 이건 주문 상태 변경을 위함
     user: User,
     { id: orderId, status }: EditOrderInput,
   ): Promise<EditOrderOutput> {
@@ -242,21 +230,18 @@ export class OrderService {
           error: 'You cant see that',
         };
       }
-
+      // 주문 수정
       let canEdit = true;
       if (user.role === UserRole.Client) {
-        canEdit = false;
-      }
-      if (user.role === UserRole.Owner) {
-        if (status !== OrderStatus.Cooking && status !== OrderStatus.Cooked) {
+        if (
+          status === OrderStatus.PickedUp ||
+          status === OrderStatus.Delivered
+        ) {
           canEdit = false;
         }
-      }
+      } // 선착순 판매 시스템이므로 고객은 남아 있는 개수만 큼 수량을 수정 가능
       if (user.role === UserRole.Delivery) {
-        if (
-          status !== OrderStatus.PickedUp &&
-          status !== OrderStatus.Delivered
-        ) {
+        if (status === OrderStatus.Pending) {
           canEdit = false;
         }
       }
@@ -272,12 +257,15 @@ export class OrderService {
         id: orderId,
         status,
       });
-
+      // 유일한 오더 그리고 변경할 상태
       const newOrder = { ...order, status };
-      if (user.role === UserRole.Owner) {
-        if (status === OrderStatus.Cooked) {
-          await this.pubSub.publish(NEW_COOKED_ORDER, {
-            cookedOrders: newOrder,
+      if (user.role === UserRole.Master) {
+        // 운영자이고
+        if (status === OrderStatus.Pending) {
+          // 만약 대기 중이라면
+          await this.pubSub.publish(NEW_READY_ORDER, {
+            // 출발 준비된 주문을 발행
+            readyOrders: newOrder,
           });
         }
       }

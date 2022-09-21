@@ -59,7 +59,6 @@ export class User extends CoreEntity {
   verified: boolean;
   // 사용자 빌딩
   // 빌딩이 사라진다고 해서 사용자의 아이디가 사라지면 안된다.
-  @Column({ nullable: true })
   @Field((type) => Building, { nullable: true })
   @ManyToOne((type) => Building, (building) => building.users, {
     onDelete: 'SET NULL',

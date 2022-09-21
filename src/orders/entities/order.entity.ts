@@ -21,8 +21,6 @@ import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
   Pending = 'Pending',
-  Cooking = 'Cooking',
-  Cooked = 'Cooked',
   PickedUp = 'PickedUp',
   Delivered = 'Delivered',
 }
@@ -33,12 +31,11 @@ registerEnumType(OrderStatus, { name: 'OrderStatus' });
 @Entity()
 export class Order extends CoreEntity {
   @Field((type) => User, { nullable: true })
-  @ManyToOne(
-    // 내가 다중 대상이 하나, 나는 주문 대상은 주문자
-    (type) => User,
-    (user) => user.orders,
-    { nullable: true, onDelete: 'SET NULL', eager: true },
-  )
+  @ManyToOne((type) => User, (user) => user.orders, {
+    nullable: true,
+    onDelete: 'SET NULL',
+    eager: true,
+  })
   customer?: User;
 
   @RelationId((order: Order) => order.customer)

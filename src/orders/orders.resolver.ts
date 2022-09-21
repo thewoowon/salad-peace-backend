@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
 import {
-  NEW_COOKED_ORDER,
+  NEW_READY_ORDER,
   NEW_ORDER_UPDATE,
   NEW_PENDING_ORDER,
   PUB_SUB,
@@ -79,7 +79,7 @@ export class OrderResolver {
   @Subscription((returns) => Order)
   @Role(['Delivery'])
   cookedOrders() {
-    return this.pubSub.asyncIterator(NEW_COOKED_ORDER);
+    return this.pubSub.asyncIterator(NEW_READY_ORDER);
   }
 
   @Subscription((returns) => Order, {

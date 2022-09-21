@@ -6,10 +6,9 @@ import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { Salad } from './salad.entity';
 
-@InputType() // 인자로 넘기기 위한 타입이라는 것을 알려줌
+@InputType({ isAbstract: true }) // 인자로 넘기기 위한 타입이라는 것을 알려줌
 @ObjectType() // graphql의 Doc을 정의하기 위한 ObjectType
 @Entity() // TypeOrm의 Entity 생성을 위한 Decorator
-// 빌딩 모델은 세가지 데코레이터를 가지고 있음
 export class Building extends CoreEntity {
   // 빌딩의 이름
   @Column({ nullable: false })

@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { UsersService } from './users.service';
 
@@ -78,7 +78,7 @@ describe('UsersService', () => {
     const createAccountArgs = {
       email: 'thewoowow@naver.com',
       password: '12345',
-      role: 0,
+      role: UserRole.Client,
       name: 'woowow',
     };
     it('should fail if user exists', async () => {
@@ -86,10 +86,10 @@ describe('UsersService', () => {
         id: 1,
         email: 'thewwwwww@naver.com',
       });
-      const result = await service.createAccount('',createAccountArgs);
+      const result = await service.createAccount('testCode', createAccountArgs);
       expect(result).toMatchObject({
         ok: false,
-        error: 'There is already a Accout that have same email',
+        error: 'There is already a Account that have same email',
       });
     });
     it('should create a new user', async () => {
@@ -104,7 +104,7 @@ describe('UsersService', () => {
         code: 'code',
         user: createAccountArgs,
       });
-      const result = await service.createAccount(createAccountArgs); // 계정 생성
+      const result = await service.createAccount('testCode', createAccountArgs); // 계정 생성
       expect(userRepository.create).toHaveBeenCalledTimes(1); // 한 번만 실행되어야 한다.
       expect(userRepository.create).toHaveBeenCalledWith(createAccountArgs); // 인자를 입력받아야 한다.
       expect(userRepository.save).toHaveBeenCalledTimes(1); // 한 번만 실행되어야 한다.
@@ -127,7 +127,7 @@ describe('UsersService', () => {
     });
     it('should fail on exception', async () => {
       userRepository.findOne.mockRejectedValue(new Error());
-      const result = await service.createAccount(createAccountArgs);
+      const result = await service.createAccount('testCode', createAccountArgs);
       expect(result).toEqual({
         ok: false,
         error: "Couldn't Make a Account from your request",
