@@ -21,13 +21,17 @@ import { Verification } from './entities/verification.entity';
 import { MailService } from 'src/mail/mail.service';
 import { UserProfileOutput } from './dtos/user-profile.dto';
 import { VerifyEmailOutput } from './dtos/verify-email.dto';
+import { Building } from 'src/buildings/entities/building.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
     @InjectRepository(Verification)
     private readonly verifications: Repository<Verification>,
+    @InjectRepository(Building)
+    private readonly buildings: Repository<Building>,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {}
@@ -36,12 +40,17 @@ export class UsersService {
     return this.users.find();
   }
 
-  async createAccount({
-    email,
-    password,
-    role,
-  }: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
+  async createAccount(
+    buildingCode,
+    { email, password, role, name }: CreateAccountInput,
+  ): Promise<{ ok: boolean; error?: string }> {
     try {
+      // 일치하는 빌딩 코드가 있는지 확인 - 유일한 building Object 반드시 가져옴
+      const getBuilding = await this.buildings.findOne({
+        where: {
+          buildingCode: buildingCode,
+        },
+      });
       const exists = await this.users.findOne({
         where: {
           email: email,
@@ -53,12 +62,14 @@ export class UsersService {
           error: 'There is already a Account that have same email',
         };
       }
-
+      // 계정 생성
       const user = await this.users.save(
         this.users.create({
           email: email,
           password: password,
           role: role,
+          name: name,
+          building: getBuilding,
         }),
       );
       // 여기에 이메일 인증 기능이 들어간다.
@@ -90,6 +101,7 @@ export class UsersService {
         select: {
           email: true,
           password: true,
+          name: true,
           id: true,
         },
         where: {
@@ -111,7 +123,17 @@ export class UsersService {
         };
       }
       // make a JWT and giv it to the user
-      const token = this.jwtService.sign({ id: user.id, email: user.email });
+      const token = this.jwtService.sign({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        buildings: {
+          buildingCode: user.building.buildingCode,
+          name: user.building.name,
+          permanentWorker: user.building.permanentWorker,
+          id: user.building.id,
+        },
+      });
       return {
         ok: true,
         token: token,
@@ -126,11 +148,18 @@ export class UsersService {
     try {
       const user = await this.users.findOneOrFail({
         select: {
+          name: true,
           email: true,
           password: true,
           id: true,
           role: true,
           verified: true,
+          building: {
+            buildingCode: true,
+            name: true,
+            permanentWorker: true,
+            id: true,
+          },
         },
         where: {
           id: id,
@@ -150,16 +179,24 @@ export class UsersService {
 
   async editProfile(
     userId: number,
-    { email, password }: EditProfileInput,
+    { email, password, name }: EditProfileInput,
+    builidngCode?: string,
   ): Promise<EditProfileOutput> {
     try {
       const user = await this.users.findOne({
         select: {
+          name: true,
           email: true,
           password: true,
           verified: true,
           id: true,
           role: true,
+          building: {
+            buildingCode: true,
+            name: true,
+            permanentWorker: true,
+            id: true,
+          },
         },
         where: {
           id: userId,
@@ -167,7 +204,24 @@ export class UsersService {
       });
       if (email) {
         user.email = email;
-        user.verified = false;
+        user.verified = false; // 재인증 필요
+        user.name = name;
+        if (builidngCode) {
+          // 빌딩 코드가 있다면 빌딩 코드를 통해 빌딩을 찾는다.
+          const getBuilding = await this.buildings.findOne({
+            where: {
+              buildingCode: builidngCode,
+            },
+          });
+          user.building = getBuilding;
+        } else {
+          const getBuilding = await this.buildings.findOne({
+            where: {
+              buildingCode: builidngCode,
+            },
+          });
+          user.building = getBuilding;
+        }
         await this.verifications.delete({ user: { id: user.id } });
         const verification = await this.verifications.save(
           this.verifications.create({ user: user }),

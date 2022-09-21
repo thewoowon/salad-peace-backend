@@ -79,13 +79,14 @@ describe('UsersService', () => {
       email: 'thewoowow@naver.com',
       password: '12345',
       role: 0,
+      name: 'woowow',
     };
     it('should fail if user exists', async () => {
       userRepository.findOne.mockResolvedValue({
         id: 1,
         email: 'thewwwwww@naver.com',
       });
-      const result = await service.createAccount(createAccountArgs);
+      const result = await service.createAccount('',createAccountArgs);
       expect(result).toMatchObject({
         ok: false,
         error: 'There is already a Accout that have same email',
