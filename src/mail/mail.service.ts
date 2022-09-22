@@ -49,7 +49,7 @@ export class MailService {
   }
 
   sendVerificationEmail(email: string, code: string) {
-    this.sendEmail('Verify Your Email', 'Salad Peace', [
+    this.sendEmail('Verify Your Email', 'salad-peace', [
       {
         key: 'username',
         value: email,

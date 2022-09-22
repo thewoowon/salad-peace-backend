@@ -54,6 +54,9 @@ import { UploadsModule } from './uploads/uploads.module';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      autoSchemaFile: true,
+      installSubscriptionHandlers: true,
+      persistedQueries: false,
       subscriptions: {
         'graphql-ws': {
           onConnect: (context: Context<any>) => {
@@ -62,9 +65,6 @@ import { UploadsModule } from './uploads/uploads.module';
           },
         },
       },
-      installSubscriptionHandlers: true,
-      autoSchemaFile: true,
-      persistedQueries: false,
       context: ({ req, extra }) => {
         if (extra) {
           return { token: extra.token };
@@ -84,7 +84,7 @@ import { UploadsModule } from './uploads/uploads.module';
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
           }),
-      synchronize: true,
+      synchronize: false,
       logging:
         process.env.NODE_ENV !== 'production' &&
         process.env.NODE_ENV !== 'test',

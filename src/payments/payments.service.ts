@@ -24,7 +24,7 @@ export class PaymentService {
     private schedulerRegistry: SchedulerRegistry,
   ) {}
   async createPayment(
-    owner: User,
+    user: User,
     { transactionId, buildingId }: CreatePaymentInput,
   ): Promise<CreatePaymentOutput> {
     try {
@@ -42,7 +42,7 @@ export class PaymentService {
       await this.payments.save(
         this.payments.create({
           transactionId: transactionId,
-          user: owner,
+          user: user,
           building: building,
         }),
       );
@@ -81,8 +81,8 @@ export class PaymentService {
     }
   }
 
-  @Interval(2000)
-  async checkPromotedRestaurants() {
+  //@Interval(2000)
+  async checkPromotedBuildings() {
     const buildings = await this.buildings.find({
       where: {
         isPromoted: true,

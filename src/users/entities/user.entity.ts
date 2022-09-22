@@ -43,7 +43,7 @@ export class User extends CoreEntity {
   @Field((type) => String)
   email: string;
   // 사용자 비밀번호
-  @Column({ select: false })
+  @Column()
   @Field((type) => String)
   @IsString()
   password: string;
@@ -61,7 +61,6 @@ export class User extends CoreEntity {
   // 빌딩이 사라진다고 해서 사용자의 아이디가 사라지면 안된다.
   @Field((type) => Building, { nullable: true })
   @ManyToOne((type) => Building, (building) => building.users, {
-    onDelete: 'SET NULL',
     nullable: true,
   })
   building: Building;

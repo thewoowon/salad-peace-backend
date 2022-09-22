@@ -37,7 +37,9 @@ export class UsersService {
   ) {}
 
   usersAll(): Promise<User[]> {
-    return this.users.find();
+    return this.users.find({
+      relations: ['building'],
+    });
   }
 
   async createAccount(
@@ -46,7 +48,7 @@ export class UsersService {
   ): Promise<{ ok: boolean; error?: string }> {
     try {
       // 일치하는 빌딩 코드가 있는지 확인 - 유일한 building Object 반드시 가져옴
-      const getBuilding = await this.buildings.findOne({
+      const building = await this.buildings.findOne({
         where: {
           buildingCode: buildingCode,
         },
@@ -62,16 +64,17 @@ export class UsersService {
           error: 'There is already a Account that have same email',
         };
       }
+      const user = this.users.create({
+        email: email,
+        password: password,
+        role: role,
+        name: name,
+      });
+      console.log('빌딩 코드 확인');
+      console.log(building);
+      user.building = building;
+      await this.users.save(user);
       // 계정 생성
-      const user = await this.users.save(
-        this.users.create({
-          email: email,
-          password: password,
-          role: role,
-          name: name,
-          building: getBuilding,
-        }),
-      );
       // 여기에 이메일 인증 기능이 들어간다.
       const verification = await this.verifications.save(
         this.verifications.create({
@@ -103,13 +106,18 @@ export class UsersService {
           password: true,
           name: true,
           id: true,
-          buildingId: true,
+          building: {
+            buildingCode: true,
+            name: true,
+            permanentWorker: true,
+            id: true,
+          },
         },
         where: {
           email: email,
         },
+        relations: ['building'],
       });
-      console.log(user);
       if (!user) {
         return {
           ok: false,
