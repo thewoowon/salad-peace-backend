@@ -66,7 +66,6 @@ export class OrderResolver {
 
   @Subscription((returns) => Order, {
     filter: (payload, _, context) => {
-      console.log(payload, context);
       return true;
     },
     resolve: ({ pendingOrders: { order } }) => order,

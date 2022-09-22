@@ -1,13 +1,27 @@
-import { ArgsType, Field } from '@nestjs/graphql';
-import { IsBoolean, IsString } from 'class-validator';
+import {
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  OmitType,
+  PickType,
+} from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import { Building } from '../entities/building.entity';
 
-@ArgsType()
-export class CreateBuildingInput {
+@InputType()
+export class CreateBuildingInput extends PickType(Building, [
+  'name',
+  'address',
+  'permanentWorker',
+  'buildingCode',
+]) {
   @Field((type) => String)
-  @IsString()
-  name: string;
+  categoryName: string;
+}
 
-  @Field((type) => Boolean)
-  @IsBoolean()
-  isBuilding: boolean;
+@ObjectType()
+export class CreateBuildingOutput extends CoreOutput {
+  @Field((type) => Int)
+  buildingId: number;
 }

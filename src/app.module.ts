@@ -66,8 +66,6 @@ import { UploadsModule } from './uploads/uploads.module';
       autoSchemaFile: true,
       persistedQueries: false,
       context: ({ req, extra }) => {
-        console.log('여기에 req, extra');
-        console.log(extra?.token);
         if (extra) {
           return { token: extra.token };
         } else {

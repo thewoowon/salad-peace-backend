@@ -21,7 +21,10 @@ export class MailService {
     emailVars: EmailVar[],
   ): Promise<boolean> {
     const form = new FormData();
-    form.append('from', `Won From Uber Eats <mailgun@${this.options.domain}>`);
+    form.append(
+      'from',
+      `Won From SALAD PEACE <mailgun@${this.options.domain}>`,
+    );
     form.append('to', `thewoowon@naver.com`);
     form.append('subject', subject);
     form.append('template', template);
@@ -46,7 +49,7 @@ export class MailService {
   }
 
   sendVerificationEmail(email: string, code: string) {
-    this.sendEmail('Verify Your Email', 'ubereats', [
+    this.sendEmail('Verify Your Email', 'Salad Peace', [
       {
         key: 'username',
         value: email,

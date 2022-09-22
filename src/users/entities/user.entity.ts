@@ -35,7 +35,7 @@ registerEnumType(UserRole, { name: 'UserRole' });
 @Entity()
 export class User extends CoreEntity {
   // 사용자 이름
-  @Column()
+  @Column({ nullable: true })
   @Field((type) => String)
   name: string;
   // 사용자 이메일

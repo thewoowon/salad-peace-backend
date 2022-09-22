@@ -103,11 +103,13 @@ export class UsersService {
           password: true,
           name: true,
           id: true,
+          buildingId: true,
         },
         where: {
           email: email,
         },
       });
+      console.log(user);
       if (!user) {
         return {
           ok: false,
