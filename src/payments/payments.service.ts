@@ -81,7 +81,7 @@ export class PaymentService {
     }
   }
 
-  //@Interval(2000)
+  @Interval(2000)
   async checkPromotedBuildings() {
     const buildings = await this.buildings.find({
       where: {

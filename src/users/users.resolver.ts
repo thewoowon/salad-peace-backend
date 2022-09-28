@@ -24,10 +24,10 @@ export class UsersResolver {
   // Mutation -> 사용자 생성
   @Mutation((returns) => CreateAccountOutput)
   async createAccount(
-    @Args('builidingCode') builidngCode: string,
+    @Args('buildingCode') buildingCode: string,
     @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
-    return this.usersService.createAccount(builidngCode, createAccountInput);
+    return this.usersService.createAccount(buildingCode, createAccountInput);
   }
   // Mutation -> 사용자 로그인
   @Mutation((returns) => LoginOutput)
