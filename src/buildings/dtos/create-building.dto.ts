@@ -13,6 +13,7 @@ import { Building } from '../entities/building.entity';
 export class CreateBuildingInput extends PickType(Building, [
   'name',
   'address',
+  'coverImg',
   'permanentWorker',
   'buildingCode',
 ]) {

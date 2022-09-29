@@ -89,10 +89,10 @@ export class PaymentService {
         promotedUntil: LessThan(new Date()),
       },
     });
-    buildings.forEach(async (restaurant) => {
-      restaurant.isPromoted = false;
-      restaurant.promotedUntil = null;
-      await this.buildings.save(restaurant);
+    buildings.forEach(async (building) => {
+      building.isPromoted = false;
+      building.promotedUntil = null;
+      await this.buildings.save(building);
     });
   }
 }

@@ -54,12 +54,12 @@ export class UsersResolver {
   async editProfile(
     @AuthUser() authUser: User,
     @Args('input') EditProfileInput: EditProfileInput,
-    @Args('builidingCode') builidngCode?: string, // 선택적 매개변수
+    @Args('buildingCode') buildingCode?: string, // 선택적 매개변수
   ): Promise<EditProfileOutput> {
     return this.usersService.editProfile(
       authUser.id,
       EditProfileInput,
-      builidngCode,
+      buildingCode,
     );
   }
   // Mutation -> 이메일 인증

@@ -25,6 +25,11 @@ export class Building extends CoreEntity {
   @Field((type) => [User])
   @OneToMany((type) => User, (user) => user.building)
   users: User[];
+
+  @Field((type) => String, { nullable: true })
+  @Column({ nullable: true })
+  @IsString()
+  coverImg: string;
   // 평균 상주 근로자 수
   @Column({ nullable: false })
   @Field((type) => Number)
