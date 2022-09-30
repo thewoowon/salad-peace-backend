@@ -217,6 +217,7 @@ export class BuildingService {
         order: {
           isPromoted: 'DESC',
         },
+        relations: ['category'],
       });
       return {
         ok: true,

@@ -174,6 +174,7 @@ export class UsersService {
         where: {
           id: id,
         },
+        relations: ['building'],
       });
       return {
         ok: true,
