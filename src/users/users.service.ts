@@ -112,11 +112,14 @@ export class UsersService {
             permanentWorker: true,
             id: true,
           },
+          category: {
+            id: true,
+          },
         },
         where: {
           email: email,
         },
-        relations: ['building'],
+        relations: ['building', 'category'],
       });
       if (!user) {
         return {
@@ -138,10 +141,13 @@ export class UsersService {
         email: user.email,
         name: user.name,
         buildings: {
-          buildingCode: user.building.buildingCode,
-          name: user.building.name,
-          permanentWorker: user.building.permanentWorker,
-          id: user.building.id,
+          buildingCode: user.building?.buildingCode,
+          name: user.building?.name,
+          permanentWorker: user.building?.permanentWorker,
+          id: user.building?.id,
+        },
+        category: {
+          id: user.category?.id,
         },
       });
       return {

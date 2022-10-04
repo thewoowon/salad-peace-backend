@@ -38,7 +38,7 @@ import { BuildingInput, BuildingOutput } from './dtos/building.dto';
 import { BuildingsInput, BuildingsOutput } from './dtos/buildings.dto';
 import { Salad } from './entities/salad.entity';
 import { CreateAccountOutput } from 'src/users/dtos/create-account.dto';
-import { CreateSaladInput, CreateSaladOutput } from './dtos/create-salad.sto';
+import { CreateSaladInput, CreateSaladOutput } from './dtos/create-salad.dto';
 import { EditSaladInput, EditSaladOutput } from './dtos/edit-salad.dto';
 import { DeleteSaladInput, DeleteSaladOutput } from './dtos/delete-salad.dto';
 import { MyBuildingsOutput } from './dtos/my-buildings.dto';

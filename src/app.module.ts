@@ -30,6 +30,7 @@ import { Category } from './buildings/entities/category.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { UploadsModule } from './uploads/uploads.module';
+import { AssignmentModule } from './assignment/assignment.module';
 
 @Module({
   imports: [
@@ -116,6 +117,7 @@ import { UploadsModule } from './uploads/uploads.module';
     PaymentsModule,
     CommonModule,
     UploadsModule,
+    AssignmentModule,
   ],
   controllers: [],
   providers: [],

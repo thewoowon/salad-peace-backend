@@ -25,7 +25,7 @@ import {
 } from './dtos/search-building.dto';
 import { BuildingInput, BuildingOutput } from './dtos/building.dto';
 import { BuildingsInput, BuildingsOutput } from './dtos/buildings.dto';
-import { CreateSaladInput, CreateSaladOutput } from './dtos/create-salad.sto';
+import { CreateSaladInput, CreateSaladOutput } from './dtos/create-salad.dto';
 import { create } from 'domain';
 import { Salad } from './entities/salad.entity';
 import { EditSaladInput, EditSaladOutput } from './dtos/edit-salad.dto';
