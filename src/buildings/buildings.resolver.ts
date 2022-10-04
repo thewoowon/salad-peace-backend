@@ -62,13 +62,28 @@ export class BuildingResolver {
     return await this.buildingService.myBuildings(master);
   }
 
+  @Query((returns) => MyBuildingsOutput)
+  @Role(['Master', 'Manager'])
+  async myAreaBuildings(@AuthUser() manager: User): Promise<MyBuildingsOutput> {
+    return await this.buildingService.myAreaBuildings(manager);
+  }
+
   @Query((returns) => MyBuildingOutput)
-  @Role(['Master'])
+  @Role(['Master', 'Manager', 'Client'])
   myBuilding(
     @AuthUser() master: User,
     @Args('input') myBuildingInput: MyBuildingInput,
   ): Promise<MyBuildingOutput> {
     return this.buildingService.myBuilding(master, myBuildingInput);
+  }
+
+  @Query((returns) => MyBuildingOutput)
+  @Role(['Master', 'Manager'])
+  myAreaBuilding(
+    @AuthUser() manager: User,
+    @Args('input') myBuildingInput: MyBuildingInput,
+  ): Promise<MyBuildingOutput> {
+    return this.buildingService.myAreaBuilding(manager, myBuildingInput);
   }
 
   @Mutation((returns) => EditProfileOutput)

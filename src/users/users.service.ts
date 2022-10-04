@@ -170,11 +170,14 @@ export class UsersService {
             permanentWorker: true,
             id: true,
           },
+          category: {
+            id: true,
+          },
         },
         where: {
           id: id,
         },
-        relations: ['building'],
+        relations: ['building', 'category'],
       });
       return {
         ok: true,

@@ -1,6 +1,7 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   BaseEntity,
   Column,
@@ -35,4 +36,8 @@ export class Category extends CoreEntity {
   @Field((type) => [Building])
   @OneToMany((type) => Building, (building) => building.category)
   buildings: Building[];
+
+  @Field((type) => [User])
+  @OneToMany((type) => User, (user) => user.category)
+  users: Category[];
 }

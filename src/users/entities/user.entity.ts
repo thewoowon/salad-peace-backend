@@ -21,11 +21,13 @@ import { IsBoolean, IsEnum, IsString } from 'class-validator';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Building } from 'src/buildings/entities/building.entity';
+import { Category } from 'src/buildings/entities/category.entity';
 
 export enum UserRole {
   Client = 'Client',
   Master = 'Master',
   Delivery = 'Delivery',
+  Manager = 'Manager',
 }
 
 registerEnumType(UserRole, { name: 'UserRole' });
@@ -57,6 +59,12 @@ export class User extends CoreEntity {
   @Field((type) => Boolean)
   @IsBoolean()
   verified: boolean;
+
+  @Field((type) => Category, { nullable: true })
+  @ManyToOne((type) => Category, (category) => category.users, {
+    nullable: true,
+  })
+  category: Category;
   // 사용자 빌딩
   // 빌딩이 사라진다고 해서 사용자의 아이디가 사라지면 안된다.
   @Field((type) => Building, { nullable: true })

@@ -353,6 +353,28 @@ export class BuildingService {
     }
   }
 
+  async myAreaBuildings(user: User): Promise<MyBuildingsOutput> {
+    try {
+      const buildings = await this.buildings.find({
+        where: {
+          category: {
+            id: user.category.id,
+          },
+        },
+        relations: ['category'],
+      });
+      return {
+        buildings: buildings,
+        ok: true,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: 'Could not find Buildings.',
+      };
+    }
+  }
+
   async myBuilding(
     user: User,
     { id }: MyBuildingInput,
@@ -361,6 +383,38 @@ export class BuildingService {
       const building = await this.buildings.findOne({
         where: {
           id: id,
+        },
+        relations: ['category', 'menu', 'orders'],
+      });
+      if (!building) {
+        return {
+          ok: false,
+          error: 'Building not Found',
+        };
+      }
+      return {
+        building: building,
+        ok: true,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: 'Could not find Building.',
+      };
+    }
+  }
+
+  async myAreaBuilding(
+    user: User,
+    { id }: MyBuildingInput,
+  ): Promise<MyBuildingOutput> {
+    try {
+      const building = await this.buildings.findOne({
+        where: {
+          id: id,
+          category: {
+            id: user.category.id,
+          },
         },
         relations: ['category', 'menu', 'orders'],
       });
