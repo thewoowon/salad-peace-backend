@@ -43,6 +43,10 @@ import { EditSaladInput, EditSaladOutput } from './dtos/edit-salad.dto';
 import { DeleteSaladInput, DeleteSaladOutput } from './dtos/delete-salad.dto';
 import { MyBuildingsOutput } from './dtos/my-buildings.dto';
 import { MyBuildingInput, MyBuildingOutput } from './dtos/my-building.dto';
+import {
+  QuantityLeftInput,
+  QuantityLeftOutput,
+} from './dtos/quantity-left.dto';
 
 @Resolver((of) => Building)
 export class BuildingResolver {
@@ -123,6 +127,15 @@ export class BuildingResolver {
     @Args('input') searchBuildingInput: SearchBuildingInput,
   ): Promise<SearchBuildingOutput> {
     return this.buildingService.searchBuildingByName(searchBuildingInput);
+  }
+
+  @Query((returns) => QuantityLeftOutput)
+  @Role(['Any'])
+  quantity(
+    @AuthUser() authUser: User,
+    @Args('input') quantityLeftInput: QuantityLeftInput,
+  ): Promise<QuantityLeftOutput> {
+    return this.buildingService.getQuantityLeft(quantityLeftInput);
   }
 }
 

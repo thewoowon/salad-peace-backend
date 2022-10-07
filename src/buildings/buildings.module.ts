@@ -11,10 +11,12 @@ import {
   BuildingResolver,
 } from './buildings.resolver';
 import { BuildingService } from './buildings.service';
+import { Order } from 'src/orders/entities/order.entity';
+import { Assignment } from 'src/assignment/entitles/assignment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Building, Salad]),
+    TypeOrmModule.forFeature([Building, Salad, Order, Assignment]),
     TypeOrmExModule.forCustomRepository([CategoryRepository]),
   ],
   controllers: [],
