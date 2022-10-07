@@ -70,7 +70,7 @@ export class OrderResolver {
     },
     resolve: ({ pendingOrders: { order } }) => order,
   })
-  @Role(['Master'])
+  @Role(['Master', 'Manager'])
   pendingOrders() {
     return this.pubSub.asyncIterator(NEW_PENDING_ORDER);
   }

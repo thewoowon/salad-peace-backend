@@ -4,7 +4,7 @@ import { Building } from 'src/buildings/entities/building.entity';
 import { Salad } from 'src/buildings/entities/salad.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne, RelationId } from 'typeorm';
 
 @InputType('CreateAssignmentInput', { isAbstract: true }) // 인자로 넘기기 위한 타입이라는 것을 알려줌
 @ObjectType() // graphql의 Doc을 정의하기 위한 ObjectType
@@ -24,19 +24,23 @@ export class Assignment extends CoreEntity {
   @Field((type) => Number)
   total: number;
 
-  @Column({ nullable: false })
   @Field((type) => Building, { nullable: true })
-  @ManyToOne(() => Building, {
-    nullable: true,
+  @ManyToOne(() => Building, (building) => building.id, {
+    nullable: false,
     onDelete: 'SET NULL',
   })
   building: Building;
 
-  @Column({ nullable: false })
+  @RelationId((assignment: Assignment) => assignment.building)
+  buildingId: number;
+
   @Field((type) => Salad, { nullable: true })
   @ManyToOne(() => Salad, {
     nullable: true,
     onDelete: 'SET NULL',
   })
   salad: Salad;
+
+  @RelationId((assignment: Assignment) => assignment.salad)
+  saladId: number;
 }

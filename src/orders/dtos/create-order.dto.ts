@@ -7,8 +7,8 @@ class CreateOrderItemInput {
   @Field((type) => Int)
   saladId: number;
 
-  @Field((type) => [OrderItemOption], { nullable: true })
-  options?: OrderItemOption[];
+  @Field((type) => Int, { nullable: true, defaultValue: 0 })
+  quantity: number;
 }
 
 @InputType()

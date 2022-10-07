@@ -21,7 +21,11 @@ export class OrderItem extends CoreEntity {
   @ManyToOne((type) => Salad, { nullable: true, onDelete: 'CASCADE' })
   salad: Salad;
 
-  @Field((type) => [OrderItemOption], { nullable: true })
-  @Column({ type: 'json', nullable: true })
-  options: OrderItemOption[];
+  @Field((type) => Int)
+  @Column({ nullable: true })
+  quantity: number;
+
+  // @Field((type) => [OrderItemOption], { nullable: true })
+  // @Column({ type: 'json', nullable: true })
+  // options: OrderItemOption[];
 }

@@ -32,6 +32,9 @@ import { EditSaladInput, EditSaladOutput } from './dtos/edit-salad.dto';
 import { DeleteSaladInput, DeleteSaladOutput } from './dtos/delete-salad.dto';
 import { MyBuildingsOutput } from './dtos/my-buildings.dto';
 import { MyBuildingInput, MyBuildingOutput } from './dtos/my-building.dto';
+import { QuantityLeftInput } from './dtos/quantity-left.dto';
+import { Assignment } from 'src/assignment/entitles/assignment.entity';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Injectable()
 export class BuildingService {
@@ -41,7 +44,52 @@ export class BuildingService {
     @InjectRepository(Salad)
     private readonly salads: Repository<Salad>,
     private readonly categories: CategoryRepository,
+
+    @InjectRepository(Assignment)
+    private readonly assignments: Repository<Assignment>,
+    @InjectRepository(Order)
+    private readonly orders: Repository<Order>,
   ) {}
+
+  async getQuantityLeft(quantityLeftInput: QuantityLeftInput) {
+    try {
+      const assignment = await this.assignments.find({
+        where: { buildingId: quantityLeftInput.id },
+        loadRelationIds: true,
+      });
+      if (!assignment) {
+        return {
+          ok: false,
+          error: 'Building not Found',
+        };
+      }
+      let total = 0;
+      for (let i = 0; i < assignment.length; i++) {
+        total += assignment[i].total;
+      }
+
+      const orders = await this.orders.find({
+        where: {
+          building: {
+            id: quantityLeftInput.id,
+          },
+        },
+      });
+
+      for (let i = 0; i < orders.length; i++) {
+        total -= orders[i].quantity;
+      }
+      return {
+        ok: true,
+        quantityLeft: total,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e,
+      };
+    }
+  }
 
   async createBuilding(
     user: User,

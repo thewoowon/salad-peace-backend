@@ -51,6 +51,7 @@ export class OrderService {
         };
       }
       let orderFinalPrice = 0;
+      let orderFinalQuantity = 0;
       const orderItems: OrderItem[] = [];
       // 단일 품목이므로 길이는 1
       for (const item of items) {
@@ -67,25 +68,14 @@ export class OrderService {
             error: 'Salad not found.',
           };
         }
-        let saladFinalPrice = salad.price;
-
-        for (const itemOption of item.options) {
-          const saladOption = salad.options.find(
-            (saladOption) => saladOption.name === itemOption.name,
-          ); // 추가적인 옵션은 갯수뿐.
-          if (saladOption) {
-            // 갯수 옵션을 찾고 있다면 가격을 곱셈하여 구한다.
-            if (saladOption.extra) {
-              saladFinalPrice = saladOption.extra * saladFinalPrice; // 갯수
-            }
-            //그 외의 추가 옵션 없으므로 종료한다.
-          }
-        }
+        const saladFinalQuantity = item.quantity;
+        const saladFinalPrice = salad.price * item.quantity;
         orderFinalPrice = orderFinalPrice + saladFinalPrice;
+        orderFinalQuantity = orderFinalQuantity + saladFinalQuantity;
         const orderItem = await this.orderItems.save(
           this.orderItems.create({
             salad,
-            options: item.options,
+            quantity: item.quantity,
           }),
         );
         orderItems.push(orderItem);
@@ -95,6 +85,7 @@ export class OrderService {
           customer: customer,
           building: building,
           total: orderFinalPrice,
+          quantity: orderFinalQuantity,
           items: orderItems,
         }),
       );

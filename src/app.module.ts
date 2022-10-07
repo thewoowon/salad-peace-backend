@@ -31,6 +31,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { UploadsModule } from './uploads/uploads.module';
 import { AssignmentModule } from './assignment/assignment.module';
+import { Assignment } from './assignment/entitles/assignment.entity';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { AssignmentModule } from './assignment/assignment.module';
         Order,
         OrderItem,
         Payment,
+        Assignment,
       ],
     }),
     UsersModule,

@@ -7,6 +7,14 @@ import {
 } from './dtos/create-assignment.dto';
 import { Assignment } from './entitles/assignment.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
+import {
+  MyAssignmentsInput,
+  MyAssignmentsOutput,
+} from './dtos/my-assignments.dto';
+import {
+  MyAssignmentInput,
+  MyAssignmentOutput,
+} from './dtos/my-assignment.dto';
 
 @Injectable()
 export class AssignmentService {
@@ -31,6 +39,54 @@ export class AssignmentService {
         ok: false,
         error: 'Could not create Assignment',
         assignmentId: null,
+      };
+    }
+  }
+
+  async myAssignments(
+    user: User,
+    myAssignmentsInput: MyAssignmentsInput,
+  ): Promise<MyAssignmentsOutput> {
+    try {
+      const assignments = await this.assignment.find({
+        where: {
+          manager: {
+            id: user.id,
+          },
+        },
+      });
+      return {
+        ok: true,
+        assignments: assignments,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: 'Could not find Assignments',
+      };
+    }
+  }
+
+  async myAssignment(
+    user: User,
+    myAssignmentInput: MyAssignmentInput,
+  ): Promise<MyAssignmentOutput> {
+    try {
+      const assignment = await this.assignment.findOne({
+        where: {
+          manager: {
+            id: user.id,
+          },
+        },
+      });
+      return {
+        ok: true,
+        assignment: assignment,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: 'Could not find Assignment',
       };
     }
   }
