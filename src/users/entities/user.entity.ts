@@ -12,12 +12,13 @@ import {
 import {
   Field,
   InputType,
+  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
-import { IsBoolean, IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Building } from 'src/buildings/entities/building.entity';
@@ -59,6 +60,11 @@ export class User extends CoreEntity {
   @Field((type) => Boolean)
   @IsBoolean()
   verified: boolean;
+
+  @Column({ nullable: true })
+  @Field((type) => Number, { nullable: true })
+  @IsNumber()
+  floor?: number;
 
   @Field((type) => Category, { nullable: true })
   @ManyToOne((type) => Category, (category) => category.users, {

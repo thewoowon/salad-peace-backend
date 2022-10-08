@@ -16,9 +16,15 @@ export class Assignment extends CoreEntity {
   @IsString()
   name: string;
   // 담당자
-  @Field((type) => [User])
-  @OneToOne((type) => User)
-  manager: User[];
+  @Field((type) => User, { nullable: false })
+  @ManyToOne((type) => User, (manager) => manager.id, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  manager: User;
+
+  @RelationId((assignment: Assignment) => assignment.manager)
+  managerId: number;
 
   @Column({ nullable: false })
   @Field((type) => Number)

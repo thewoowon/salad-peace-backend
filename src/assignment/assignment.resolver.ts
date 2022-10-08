@@ -62,15 +62,4 @@ export class AssignmentResolver {
   ): Promise<MyAssignmentOutput> {
     return this.assignmentService.myAssignment(authUser, myAssignmentInput);
   }
-
-  @Subscription((returns) => Assignment, {
-    filter: (payload, _, context) => {
-      return true;
-    },
-    resolve: ({ pendingOrders: { order } }) => order,
-  })
-  @Role(['Manager', 'Master'])
-  pendingOrders() {
-    return this.pubSub.asyncIterator(NEW_PENDING_ORDER);
-  }
 }

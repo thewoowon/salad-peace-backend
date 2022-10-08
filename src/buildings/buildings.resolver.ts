@@ -135,7 +135,7 @@ export class BuildingResolver {
     @AuthUser() authUser: User,
     @Args('input') quantityLeftInput: QuantityLeftInput,
   ): Promise<QuantityLeftOutput> {
-    return this.buildingService.getQuantityLeft(quantityLeftInput);
+    return this.buildingService.getQuantityLeft(authUser, quantityLeftInput);
   }
 }
 

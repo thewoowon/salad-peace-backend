@@ -32,7 +32,10 @@ import { EditSaladInput, EditSaladOutput } from './dtos/edit-salad.dto';
 import { DeleteSaladInput, DeleteSaladOutput } from './dtos/delete-salad.dto';
 import { MyBuildingsOutput } from './dtos/my-buildings.dto';
 import { MyBuildingInput, MyBuildingOutput } from './dtos/my-building.dto';
-import { QuantityLeftInput } from './dtos/quantity-left.dto';
+import {
+  QuantityLeftInput,
+  QuantityLeftOutput,
+} from './dtos/quantity-left.dto';
 import { Assignment } from 'src/assignment/entitles/assignment.entity';
 import { Order } from 'src/orders/entities/order.entity';
 
@@ -51,10 +54,17 @@ export class BuildingService {
     private readonly orders: Repository<Order>,
   ) {}
 
-  async getQuantityLeft(quantityLeftInput: QuantityLeftInput) {
+  async getQuantityLeft(
+    user: User,
+    quantityLeftInput: QuantityLeftInput,
+  ): Promise<QuantityLeftOutput> {
     try {
       const assignment = await this.assignments.find({
-        where: { buildingId: quantityLeftInput.id },
+        where: {
+          building: {
+            id: user.buildingId,
+          },
+        },
         loadRelationIds: true,
       });
       if (!assignment) {
@@ -67,7 +77,6 @@ export class BuildingService {
       for (let i = 0; i < assignment.length; i++) {
         total += assignment[i].total;
       }
-
       const orders = await this.orders.find({
         where: {
           building: {
@@ -81,7 +90,7 @@ export class BuildingService {
       }
       return {
         ok: true,
-        quantityLeft: total,
+        quantity: total,
       };
     } catch (e) {
       return {

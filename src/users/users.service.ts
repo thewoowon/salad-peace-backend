@@ -61,7 +61,8 @@ export class UsersService {
       if (exists) {
         return {
           ok: false,
-          error: 'There is already a Account that have same email',
+          error:
+            '이미 존재하는 이메일 주소입니다. 다른 이메일 주소를 사용해 주세요.',
         };
       }
       const user = this.users.create({
@@ -70,8 +71,6 @@ export class UsersService {
         role: role,
         name: name,
       });
-      console.log('빌딩 코드 확인');
-      console.log(building);
       user.building = building;
       await this.users.save(user);
       // 계정 생성
@@ -89,7 +88,8 @@ export class UsersService {
       console.log(e);
       return {
         ok: false,
-        error: "Couldn't Make a Account from your request",
+        error:
+          '계정을 생성하지 못했습니다. 내부 오류일 수 있습니다. 다시 시도해 주세요.',
       };
     }
   }
@@ -124,7 +124,7 @@ export class UsersService {
       if (!user) {
         return {
           ok: false,
-          error: 'User not found',
+          error: '존재하지 않는 이메일 계정입니다. 계정을 생성해 주세요.',
         };
       }
       // check if the password is correct
@@ -132,7 +132,7 @@ export class UsersService {
       if (!passwordCorrect) {
         return {
           ok: false,
-          error: 'Wrong Password',
+          error: '비밀번호가 일치하지 않습니다.',
         };
       }
       // make a JWT and giv it to the user
