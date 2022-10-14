@@ -41,7 +41,7 @@ export class Assignment extends CoreEntity {
   buildingId: number;
 
   @Field((type) => Salad, { nullable: true })
-  @ManyToOne(() => Salad, {
+  @ManyToOne(() => Salad, (salad) => salad.id, {
     nullable: true,
     onDelete: 'SET NULL',
   })

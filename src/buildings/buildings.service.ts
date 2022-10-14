@@ -306,9 +306,26 @@ export class BuildingService {
           error: 'Building not found',
         };
       }
+
+      const assignmentList: Assignment[] = [];
+
+      for (const salad of building.menu) {
+        const myAssignments = await this.assignments.find({
+          where: {
+            salad: {
+              id: salad.id,
+            },
+          },
+          relations: ['building', 'salad'],
+        });
+        for (const assignment of myAssignments) {
+          assignmentList.push(assignment);
+        }
+      }
       return {
         ok: true,
         building: building,
+        assignments: assignmentList,
       };
     } catch (e) {
       return {

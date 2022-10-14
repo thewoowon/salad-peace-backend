@@ -50,8 +50,8 @@ export class AssignmentService {
     try {
       const assignments = await this.assignment.find({
         where: {
-          manager: {
-            id: user.id,
+          building: {
+            id: myAssignmentsInput.id,
           },
         },
       });
