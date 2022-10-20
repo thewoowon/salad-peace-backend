@@ -176,6 +176,7 @@ export class UsersService {
             permanentWorker: true,
             id: true,
             coverImg: true,
+            address: true,
           },
           category: {
             id: true,
