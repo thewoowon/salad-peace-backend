@@ -47,6 +47,7 @@ import {
   QuantityLeftInput,
   QuantityLeftOutput,
 } from './dtos/quantity-left.dto';
+import { BuildingsNoneOutput } from './dtos/buildings_none.dto';
 
 @Resolver((of) => Building)
 export class BuildingResolver {
@@ -113,6 +114,11 @@ export class BuildingResolver {
     @Args('input') buildingsInput: BuildingsInput,
   ): Promise<BuildingsOutput> {
     return this.buildingService.allBuildings(buildingsInput);
+  }
+
+  @Query((returns) => BuildingsNoneOutput)
+  buildings_none(@AuthUser() authUser: User): Promise<BuildingsNoneOutput> {
+    return this.buildingService.allBuildings_none();
   }
 
   @Query((returns) => BuildingOutput)

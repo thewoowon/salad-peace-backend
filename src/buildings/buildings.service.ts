@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, Like, RelationId, Repository } from 'typeorm';
+import { ILike, In, Like, MoreThan, RelationId, Repository } from 'typeorm';
 import { Building } from './entities/building.entity';
 import {
   CreateBuildingInput,
@@ -38,6 +38,7 @@ import {
 } from './dtos/quantity-left.dto';
 import { Assignment } from 'src/assignment/entitles/assignment.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { BuildingsNoneOutput } from './dtos/buildings_none.dto';
 
 @Injectable()
 export class BuildingService {
@@ -59,11 +60,21 @@ export class BuildingService {
     quantityLeftInput: QuantityLeftInput,
   ): Promise<QuantityLeftOutput> {
     try {
+      const today = new Date();
       const assignment = await this.assignments.find({
         where: {
           building: {
             id: user.buildingId,
           },
+          createdAt: MoreThan(
+            new Date(
+              today.getFullYear() +
+                '-' +
+                (today.getMonth() + 1) +
+                '-' +
+                today.getDate(),
+            ),
+          ),
         },
         loadRelationIds: true,
       });
@@ -281,6 +292,24 @@ export class BuildingService {
         results: buildings,
         totalPages: Math.ceil(totalResults / 25),
         totalResults,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not load Buildings',
+      };
+    }
+  }
+
+  async allBuildings_none(): Promise<BuildingsNoneOutput> {
+    try {
+      const [buildings, totalResults] = await this.buildings.findAndCount({
+        select: ['id', 'name', 'coverImg', 'address'],
+      });
+      return {
+        ok: true,
+        results: buildings,
+        count: totalResults,
       };
     } catch {
       return {
