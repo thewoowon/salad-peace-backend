@@ -69,10 +69,11 @@ export class OrderResolver {
       return true;
     },
     resolve: ({ pendingOrders: { order } }) => order,
+    name: 'pendingOrders',
   })
-  @Role(['Master', 'Manager'])
+  @Role(['Master', 'Manager', 'Client'])
   pendingOrders() {
-    return this.pubSub.asyncIterator(NEW_PENDING_ORDER);
+    return this.pubSub.asyncIterator([NEW_PENDING_ORDER]);
   }
 
   @Subscription((returns) => Order)

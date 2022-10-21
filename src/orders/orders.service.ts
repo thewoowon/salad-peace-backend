@@ -90,7 +90,7 @@ export class OrderService {
         }),
       );
       await this.pubSub.publish(NEW_PENDING_ORDER, {
-        pendingOrders: { order, builingId: building.id },
+        pendingOrders: { order: order, builingId: building.id },
       });
       return {
         ok: true,
