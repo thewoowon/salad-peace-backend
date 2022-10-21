@@ -72,7 +72,8 @@ export class BuildingService {
                 '-' +
                 (today.getMonth() + 1) +
                 '-' +
-                today.getDate(),
+                today.getDate() +
+                ' 00:00:00',
             ),
           ),
         },
