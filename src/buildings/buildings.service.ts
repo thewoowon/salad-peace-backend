@@ -324,6 +324,7 @@ export class BuildingService {
     buildingId,
   }: BuildingInput): Promise<BuildingOutput> {
     try {
+      const today = new Date();
       const building = await this.buildings.findOne({
         where: {
           id: buildingId,
@@ -345,6 +346,16 @@ export class BuildingService {
             salad: {
               id: salad.id,
             },
+            createdAt: MoreThan(
+              new Date(
+                today.getFullYear() +
+                  '-' +
+                  (today.getMonth() + 1) +
+                  '-' +
+                  today.getDate() +
+                  ' 00:00:00',
+              ),
+            ),
           },
           relations: ['building', 'salad'],
         });
