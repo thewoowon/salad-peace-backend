@@ -185,6 +185,51 @@ export class OrderService {
     }
   }
 
+  async myOrder(
+    user: User,
+    { id: orderId }: GetOrderInput,
+  ): Promise<GetOrderOutput> {
+    try {
+      const order = await this.orders.findOne({
+        where: {
+          id: orderId,
+        },
+        relations: ['items', 'customer'],
+      });
+      if (!order) {
+        return {
+          ok: false,
+          error: 'Order not found.',
+        };
+      }
+      const salads = [];
+      for (const item of order.items) {
+        const salad = await this.salads.findOne({
+          where: {
+            id: item.saladId,
+          },
+        });
+        salads.push(salad);
+      }
+      if (!this.canSeeOrder(user, order)) {
+        return {
+          ok: false,
+          error: 'You cant see that',
+        };
+      }
+      return {
+        ok: true,
+        order,
+        salads: salads,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e,
+      };
+    }
+  }
+
   canSeeOrder(user: User, order: Order): boolean {
     let canSee = true;
     if (user.role === UserRole.Client && order.customerId !== user.id) {

@@ -8,7 +8,7 @@ export class CreatePaymentInput extends PickType(Payment, [
   'buildingId',
 ]) {
   @Field((type) => Int)
-  restaurantId: number;
+  buildingId: number;
 }
 
 @ObjectType()

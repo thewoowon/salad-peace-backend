@@ -55,6 +55,15 @@ export class OrderResolver {
     return this.ordersService.getOrder(user, getOrderInput);
   }
 
+  @Query((returns) => GetOrderOutput)
+  @Role(['Any'])
+  async myOrder(
+    @AuthUser() user: User,
+    @Args('input') getOrderInput: GetOrderInput,
+  ): Promise<GetOrderOutput> {
+    return this.ordersService.myOrder(user, getOrderInput);
+  }
+
   @Mutation((returns) => EditOrderOutput)
   @Role(['Any'])
   async editOrder(

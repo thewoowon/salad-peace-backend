@@ -2,6 +2,7 @@ import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { IsNumber, IsString, Length } from 'class-validator';
 import { Assignment } from 'src/assignment/entitles/assignment.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { OrderItem } from 'src/orders/entities/order-item.entity';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Building } from './building.entity';
 
@@ -66,4 +67,8 @@ export class Salad extends CoreEntity {
   @Field((type) => [SaladOption], { nullable: true })
   @Column({ type: 'json', nullable: true })
   options?: SaladOption[];
+
+  @Field((type) => [OrderItem])
+  @OneToMany((type) => OrderItem, (orderItem) => orderItem.salad)
+  orderItems: OrderItem[];
 }
