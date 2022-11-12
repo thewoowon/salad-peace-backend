@@ -196,18 +196,20 @@ export class OrderService {
         },
         relations: ['items', 'customer'],
       });
+
       if (!order) {
         return {
           ok: false,
           error: 'Order not found.',
         };
       }
-      const salads = [];
+      const salads: OrderItem[] = [];
       for (const item of order.items) {
-        const salad = await this.salads.findOne({
+        const salad = await this.orderItems.findOne({
           where: {
-            id: item.saladId,
+            id: item.id,
           },
+          relations: ['salad'],
         });
         salads.push(salad);
       }
