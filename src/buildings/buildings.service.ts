@@ -94,9 +94,18 @@ export class BuildingService {
           building: {
             id: quantityLeftInput.id,
           },
+          createdAt: MoreThan(
+            new Date(
+              today.getFullYear() +
+                '-' +
+                (today.getMonth() + 1) +
+                '-' +
+                today.getDate() +
+                ' 00:00:00',
+            ),
+          ),
         },
       });
-
       for (let i = 0; i < orders.length; i++) {
         total -= orders[i].quantity;
       }
