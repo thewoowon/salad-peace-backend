@@ -89,6 +89,7 @@ export class BuildingService {
       for (let i = 0; i < assignment.length; i++) {
         total += assignment[i].total;
       }
+      console.log(quantityLeftInput.id);
       const orders = await this.orders.find({
         where: {
           building: {

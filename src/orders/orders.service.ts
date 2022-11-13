@@ -39,11 +39,13 @@ export class OrderService {
     { items }: CreateOrderInput,
   ): Promise<CreateOrderOutput> {
     try {
+      console.log(customer);
       const building = await this.buildings.findOne({
         where: {
-          id: customer.buildingId,
+          id: customer.building.id,
         },
       });
+      console.log(building);
       if (!building) {
         return {
           ok: false,
@@ -97,7 +99,6 @@ export class OrderService {
         orderId: order.id,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: 'Could not create order.',
