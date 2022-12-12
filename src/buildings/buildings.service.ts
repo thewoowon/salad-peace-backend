@@ -315,7 +315,7 @@ export class BuildingService {
   async allBuildings_none(): Promise<BuildingsNoneOutput> {
     try {
       const [buildings, totalResults] = await this.buildings.findAndCount({
-        select: ['id', 'name', 'coverImg', 'address'],
+        relations: ['category'],
       });
       return {
         ok: true,

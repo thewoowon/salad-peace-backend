@@ -44,9 +44,10 @@ export class UsersService {
 
   async createAccount(
     buildingCode,
-    { email, password, role, name }: CreateAccountInput,
+    { email, password, role, name, floor }: CreateAccountInput,
   ): Promise<{ ok: boolean; error?: string }> {
     try {
+      console.log('진입');
       // 일치하는 빌딩 코드가 있는지 확인 - 유일한 building Object 반드시 가져옴
       const building = await this.buildings.findOne({
         where: {
@@ -70,6 +71,7 @@ export class UsersService {
         password: password,
         role: role,
         name: name,
+        floor: floor,
       });
       user.building = building;
       await this.users.save(user);
